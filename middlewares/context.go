@@ -5,7 +5,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/grasp-labs/dsserver/config"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"strings"
 )
 
@@ -37,7 +36,6 @@ func (c *DSContext) setDataFromClaims(a DSClaims) {
 // that contains the user's sub, aud, rol, cls, ver, tenant_name, tenant_id, and request_id
 // It should be the first middleware in the chain
 func NewDSContextMiddleware(cfg *config.Config) echo.MiddlewareFunc {
-	log.Info("Calling DSAuthContextMiddleware")
 	// Parse and validate the token
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

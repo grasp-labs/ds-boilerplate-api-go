@@ -25,4 +25,6 @@ type Config struct {
 	ProductId uuid.UUID
 	// MemoryMB defines the memory in MB for the service
 	MemoryMb string `default:"1024"` // default to 1024
+	// AllowedOrigins defines the allowed origins for the service
+	AllowedOrigins []string `default:"*"` // default to *
 }

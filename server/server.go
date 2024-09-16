@@ -7,6 +7,7 @@ import (
 	"github.com/grasp-labs/dsserver/utils/cache_manager"
 	"github.com/grasp-labs/dsserver/utils/log"
 	"github.com/labstack/echo/v4"
+	echoMiddlewares "github.com/labstack/echo/v4/middleware"
 )
 
 var cacheManger *cache_manager.CacheManager // nolint:unused
@@ -40,6 +41,10 @@ func NewServer(cfg *config.Config) *echo.Echo {
 	}
 
 	e := echo.New()
+	e.Use(echoMiddlewares.CORSWithConfig(echoMiddlewares.CORSConfig{
+		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
+		AllowOrigins: cfg.AllowedOrigins,
+	}))
 	healthController := NewHealthController()
 	healthSubRouter := e.Group(cfg.AppRootPath)
 	RegisterRoutes(cfg, healthSubRouter, healthController)

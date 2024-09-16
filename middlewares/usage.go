@@ -57,6 +57,9 @@ func NewUsageMiddleware(cfg *config.Config) echo.MiddlewareFunc {
 
 			client := sqs.NewSQSClient(usageQueue)
 			err = client.SendUsageMessage(context.Background(), "usage", usageMessageAttributes)
+			if err != nil {
+				logger.Error().Err(err).Msg("Error sending usage message")
+			}
 
 			return err
 		}
