@@ -7,6 +7,7 @@ import (
 	"github.com/grasp-labs/dsserver/errors"
 	"github.com/grasp-labs/dsserver/utils/aws/dynamodb"
 	"github.com/grasp-labs/dsserver/utils/log"
+	"github.com/labstack/echo/v4"
 	"net"
 	"net/http"
 	"strings"

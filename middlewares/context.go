@@ -3,6 +3,7 @@ package middlewares
 import (
 	"github.com/google/uuid"
 	"github.com/grasp-labs/dsserver/config"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"strings"
 )

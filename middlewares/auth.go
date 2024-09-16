@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/grasp-labs/dsserver/config"
 	"github.com/grasp-labs/dsserver/utils/aws/parameterstore"
 	"github.com/grasp-labs/dsserver/utils/cache_manager"
 	echojwt "github.com/labstack/echo-jwt/v4"
+	"github.com/labstack/echo/v4"
 )
 
 const (
