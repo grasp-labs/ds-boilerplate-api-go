@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"encoding/json"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/grasp-labs/dsserver/config"
 	"github.com/grasp-labs/dsserver/errors"
 	"github.com/grasp-labs/dsserver/utils/cache_manager"

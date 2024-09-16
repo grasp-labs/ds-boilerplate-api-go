@@ -6,6 +6,7 @@ import (
 	"github.com/grasp-labs/dsserver/models"
 	"github.com/grasp-labs/dsserver/utils/cache_manager"
 	"github.com/grasp-labs/dsserver/utils/log"
+	"github.com/labstack/echo/v4"
 )
 
 var cacheManger *cache_manager.CacheManager // nolint:unused
