@@ -12,10 +12,12 @@ import (
 	"github.com/grasp-labs/dsserver/utils/cache_manager"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"strings"
 )
 
 const (
 	DevAuthKey    = "AUTH_JWT_PUBLIC_KEY_DEV"
+	ProdAuthKey   = "AUTH_JWT_PUBLIC_KEY_PROD"
 	SigningMethod = "RS256"
 )
 
@@ -29,7 +31,13 @@ type DSClaims struct {
 }
 
 // Fetch the public key from AWS SSM
-func fetchPublicKey(ctx context.Context) (*rsa.PublicKey, error) {
+func fetchPublicKey(cfg *config.Config, ctx context.Context) (*rsa.PublicKey, error) {
+	publicKeyMap := map[string]string{
+		"dev":  DevAuthKey,
+		"prod": ProdAuthKey,
+	}
+	publicKeyName := publicKeyMap[strings.ToLower(cfg.BuildingMode)]
+
 	cacheManager := cache_manager.GetCacheManager()
 	entry, err := cacheManager.Get("auth_jwt_public")
 	if err == nil {
@@ -44,7 +52,7 @@ func fetchPublicKey(ctx context.Context) (*rsa.PublicKey, error) {
 
 	// Retrieve the public key from SSM Parameter Store
 	param, err := client.GetParameter(ctx, &ssm.GetParameterInput{
-		Name:           aws.String(DevAuthKey),
+		Name:           aws.String(publicKeyName),
 		WithDecryption: aws.Bool(true),
 	})
 	if err != nil {
@@ -64,7 +72,7 @@ func fetchPublicKey(ctx context.Context) (*rsa.PublicKey, error) {
 }
 
 func NewAuthMiddleware(cfg *config.Config) echo.MiddlewareFunc {
-	publicKey, _ := fetchPublicKey(context.Background())
+	publicKey, _ := fetchPublicKey(cfg, context.Background())
 
 	jwtConfig := echojwt.Config{
 		SigningKey:    publicKey,
