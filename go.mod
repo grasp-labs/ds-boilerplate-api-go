@@ -1,4 +1,4 @@
-module github.com/grasp-labs/dsserver
+module github.com/grasp-labs/ds-boilerplate-api-go
 
 go 1.23.1
 

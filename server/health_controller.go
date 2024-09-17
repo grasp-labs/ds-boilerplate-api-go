@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/grasp-labs/dsserver/config"
-	"github.com/grasp-labs/dsserver/models"
+	"github.com/grasp-labs/ds-boilerplate-api-go/config"
+	"github.com/grasp-labs/ds-boilerplate-api-go/models"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"time"

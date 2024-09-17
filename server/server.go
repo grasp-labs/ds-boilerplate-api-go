@@ -1,11 +1,11 @@
 package server
 
 import (
-	"github.com/grasp-labs/dsserver/config"
-	"github.com/grasp-labs/dsserver/middlewares"
-	"github.com/grasp-labs/dsserver/models"
-	"github.com/grasp-labs/dsserver/utils/cache_manager"
-	"github.com/grasp-labs/dsserver/utils/log"
+	"github.com/grasp-labs/ds-boilerplate-api-go/config"
+	"github.com/grasp-labs/ds-boilerplate-api-go/middlewares"
+	"github.com/grasp-labs/ds-boilerplate-api-go/models"
+	"github.com/grasp-labs/ds-boilerplate-api-go/utils/cache_manager"
+	"github.com/grasp-labs/ds-boilerplate-api-go/utils/log"
 	"github.com/labstack/echo/v4"
 	echoMiddlewares "github.com/labstack/echo/v4/middleware"
 )

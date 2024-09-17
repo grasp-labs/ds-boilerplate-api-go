@@ -63,7 +63,7 @@ Copy code
 
     import (
         "github.com/grasp-labs/dsserver"
-        "github.com/grasp-labs/dsserver/utils/log"
+        "github.com/grasp-labs/ds-boilerplate-api-go/utils/log"
         "github.com/creasty/defaults"
     )
 
@@ -90,7 +90,7 @@ Then you get a basic server running on port 8081 with predefined health check ro
 4. Add your own routes.
 ```go
 
-import "github.com/grasp-labs/dsserver/models"
+import "github.com/grasp-labs/ds-boilerplate-api-go/models"
 
 type SampleController struct {
 	*models.DefaultController
