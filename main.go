@@ -36,6 +36,15 @@ func (c *SampleController) GetRoutes() models.Routes {
 	return routes
 }
 
+// @title DSServer API
+// @version 1.0.0
+// @description This is the API for DSServer
+// @contact.name Grasp Labs
+// @contact.url https://grasp.labs
+// @contact.email yuan@grasplabs.no
+// @Server http://localhost:8080
+// @BasePath /api/v1
+//
 //go:generate swagger generate spec
 func main() {
 	cfg := config.Config{

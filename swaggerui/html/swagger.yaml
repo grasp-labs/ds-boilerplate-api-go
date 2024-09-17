@@ -1,0 +1,54 @@
+basePath: /api/v1
+definitions:
+  models.ServerStatus:
+    properties:
+      details:
+        type: string
+      time:
+        type: string
+    type: object
+  models.ServerVersion:
+    properties:
+      version:
+        type: string
+    type: object
+info:
+  contact:
+    email: yuan@grasplabs.no
+    name: Grasp Labs
+    url: https://grasp.labs
+  description: This is the API for DSServer
+  title: DSServer API
+  version: 1.0.0
+paths:
+  /public/health-check/:
+    get:
+      consumes:
+      - application/json
+      description: Returns the health status of the server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ServerStatus'
+      summary: Returns the health status of the server
+      tags:
+      - Health
+  /public/version/:
+    get:
+      consumes:
+      - application/json
+      description: Returns the version of the server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ServerVersion'
+      summary: Returns the version of the server
+      tags:
+      - Health
+swagger: "2.0"

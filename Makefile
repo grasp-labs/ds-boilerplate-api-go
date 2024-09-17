@@ -5,15 +5,14 @@ lint: bootstrap
 .PHONY: swagger
 swagger: SHELL:=/bin/bash
 swagger: bootstrap
-	swagger generate spec -o ./swaggerui/html/swagger.json --scan-models --exclude-deps
-	swagger validate ./swaggerui/html/swagger.json
+	swag init -o ./swaggerui/html
 
 HAS_SWAGGER       := $(shell command -v swagger;)
 HAS_GOLANGCI_LINT := $(shell command -v golangci-lint;)
 
 bootstrap:
 ifndef HAS_SWAGGER
-	go install github.com/go-swagger/go-swagger/cmd/swagger@v0.31.0
+	go get -d github.com/swaggo/swag/cmd/swag
 endif
 ifndef HAS_GOLANGCI_LINT
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3

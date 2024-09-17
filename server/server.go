@@ -49,6 +49,9 @@ func NewServer(cfg *config.Config) *echo.Echo {
 	healthSubRouter := e.Group("/public")
 	RegisterRoutes(cfg, healthSubRouter, healthController)
 
+	// docs
+	e.Static("/docs", "swaggerui/html")
+
 	Protected = e.Group(cfg.AppRootPath)
 	Protected.Use(middlewares.NewAuthMiddleware(cfg))
 	Protected.Use(middlewares.NewDSContextMiddleware(cfg))
