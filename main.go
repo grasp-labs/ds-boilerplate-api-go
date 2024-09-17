@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/creasty/defaults"
 	"github.com/grasp-labs/dsserver/config"
+	_ "github.com/grasp-labs/dsserver/docs"
 	"github.com/grasp-labs/dsserver/models"
 	"github.com/grasp-labs/dsserver/server"
 	"github.com/labstack/echo/v4"
@@ -35,6 +36,7 @@ func (c *SampleController) GetRoutes() models.Routes {
 	return routes
 }
 
+//go:generate swagger generate spec
 func main() {
 	cfg := config.Config{
 		AppRootPath: "/app",

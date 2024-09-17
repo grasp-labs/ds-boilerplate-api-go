@@ -26,7 +26,7 @@ func (c *HealthController) GetRoutes() models.Routes {
 		models.Route{
 			Path:                      "/health-check/",
 			Method:                    "GET",
-			HandlerFunc:               c.healthCheck,
+			HandlerFunc:               c.HealthCheck,
 			AllowUnauthenticatedUsers: true,
 		},
 		models.Route{
@@ -39,7 +39,18 @@ func (c *HealthController) GetRoutes() models.Routes {
 	return routes
 }
 
-func (c *HealthController) healthCheck(ctx echo.Context) error {
+// HealthCheck returns the health status of the server
+// swagger:operation GET /health-check/ health-check
+// ---
+// summary: Health check endpoint
+// description: Health check endpoint
+// responses:
+//
+//		"200":
+//		  description: "Server running status"
+//		  schema:
+//	      	$ref: "#/definitions/ServerStatus"
+func (c *HealthController) HealthCheck(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, &models.ServerStatus{
 		Details: "Server is running",
 		Time:    time.Now().String(),

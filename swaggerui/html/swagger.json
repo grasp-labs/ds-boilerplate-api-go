@@ -1,0 +1,38 @@
+{
+  "swagger": "2.0",
+  "info": {},
+  "paths": {
+    "/health-check/": {
+      "get": {
+        "description": "Health check endpoint",
+        "summary": "Health check endpoint",
+        "operationId": "health-check",
+        "responses": {
+          "200": {
+            "description": "Server running status",
+            "schema": {
+              "$ref": "#/definitions/ServerStatus"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ServerStatus": {
+      "description": "ServerStatus represents the status of the server",
+      "type": "object",
+      "properties": {
+        "details": {
+          "type": "string",
+          "x-go-name": "Details"
+        },
+        "time": {
+          "type": "string",
+          "x-go-name": "Time"
+        }
+      },
+      "x-go-package": "github.com/grasp-labs/dsserver/models"
+    }
+  }
+}

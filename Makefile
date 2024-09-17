@@ -2,6 +2,12 @@
 lint: bootstrap
 	golangci-lint run --max-same-issues 0 --timeout 10m
 
+.PHONY: swagger
+swagger: SHELL:=/bin/bash
+swagger: bootstrap
+	swagger generate spec -o ./swaggerui/html/swagger.json --scan-models --exclude-deps
+	swagger validate ./swaggerui/html/swagger.json
+
 HAS_SWAGGER       := $(shell command -v swagger;)
 HAS_GOLANGCI_LINT := $(shell command -v golangci-lint;)
 
