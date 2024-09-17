@@ -55,9 +55,9 @@ func main() {
 		fmt.Printf("Method: %s, Path: %s\n", route.Method, route.Path)
 	}
 
+	log.Infof("Server started on port %s", cfg.Port)
 	if err := srv.Start(":8081"); !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
 
-	log.Infof("Server started on port %s", cfg.Port)
 }

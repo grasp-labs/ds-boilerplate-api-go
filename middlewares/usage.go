@@ -9,6 +9,7 @@ import (
 	"github.com/grasp-labs/dsserver/utils/aws/sqs"
 	"github.com/grasp-labs/dsserver/utils/log"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog"
 	"net/http"
 	"strings"
 	"time"
@@ -25,7 +26,7 @@ func NewUsageMiddleware(cfg *config.Config) echo.MiddlewareFunc {
 		"prod": ProdUsageQueue,
 	}
 
-	usageQueue, _ := usageQueueMap[strings.ToLower(cfg.BuildingMode)]
+	usageQueue := usageQueueMap[strings.ToLower(cfg.BuildingMode)]
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -40,28 +41,29 @@ func NewUsageMiddleware(cfg *config.Config) echo.MiddlewareFunc {
 			}
 
 			startTime := time.Now()
+			defer sendUsageReport(dsContext, cfg, startTime, logger, usageQueue)
 
-			err := next(c)
-
-			endTime := time.Now()
-
-			usageMessageAttributes := sqs.NewUsageMessageAttributes(
-				dsContext.TenantID.String(),
-				cfg.ProductId.String(),
-				cfg.MemoryMb,
-				startTime.String(),
-				endTime.String(),
-				dsContext.Path(),
-			)
-			logger.Info().Interface("usageMessageAttributes", usageMessageAttributes).Msg("Sending usage message")
-
-			client := sqs.NewSQSClient(usageQueue)
-			err = client.SendUsageMessage(context.Background(), "usage", usageMessageAttributes)
-			if err != nil {
-				logger.Error().Err(err).Msg("Error sending usage message")
-			}
-
-			return err
+			return next(c)
 		}
+	}
+}
+
+func sendUsageReport(dsContext *DSContext, cfg *config.Config, startTime time.Time, logger zerolog.Logger, usageQueue string) {
+	endTime := time.Now()
+
+	usageMessageAttributes := sqs.NewUsageMessageAttributes(
+		dsContext.TenantID.String(),
+		cfg.ProductId.String(),
+		cfg.MemoryMb,
+		startTime.String(),
+		endTime.String(),
+		dsContext.Path(),
+	)
+	logger.Info().Interface("usageMessageAttributes", usageMessageAttributes).Msg("Sending usage message")
+
+	client := sqs.NewSQSClient(usageQueue)
+	err := client.SendUsageMessage(context.Background(), "usage", usageMessageAttributes)
+	if err != nil {
+		logger.Error().Err(err).Msg("Error sending usage message")
 	}
 }

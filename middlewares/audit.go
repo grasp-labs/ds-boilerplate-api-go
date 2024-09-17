@@ -8,6 +8,7 @@ import (
 	"github.com/grasp-labs/dsserver/utils/aws/dynamodb"
 	"github.com/grasp-labs/dsserver/utils/log"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog"
 	"net"
 	"net/http"
 	"strings"
@@ -39,7 +40,7 @@ func NewAuditMiddleware(cfg *config.Config) echo.MiddlewareFunc {
 	}
 
 	dynamodbClient := dynamodb.NewDynamoDBClient()
-	auditTable, _ := auditTableMap[strings.ToLower(cfg.BuildingMode)]
+	auditTable := auditTableMap[strings.ToLower(cfg.BuildingMode)]
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -48,37 +49,38 @@ func NewAuditMiddleware(cfg *config.Config) echo.MiddlewareFunc {
 				return c.JSON(http.StatusInternalServerError, errors.ServerError("DSContext not found"))
 			}
 			startTime := time.Now()
-			err := next(c)
-
-			if isLocalIP(c.RealIP()) {
-				logger.Warn().Msg("Local IP address skipped")
-				//return err
-			}
-
-			endTime := time.Now()
-			processTime := endTime.Sub(startTime).String()
-			auditPayload := AuditPayload{
-				ID:          dsCtx.RequestID.String(),
-				TenantID:    dsCtx.TenantID.String(),
-				Url:         c.Request().URL.Path,
-				Method:      c.Request().Method,
-				ClientIp:    c.RealIP(),
-				StatusCode:  c.Response().Status,
-				Sub:         dsCtx.Sub,
-				ProcessTime: processTime,
-				CreatedAt:   startTime.Format(time.RFC3339),
-			}
-			logger.Info().Interface("auditPayload", auditPayload).Msg("Audit log")
-
-			// Send the audit log to the audit table
-			item := convertAuditPayloadToDynamoDBMap(auditPayload)
-			err = dynamodb.AddItem(dynamodbClient, auditTable, item)
-			if err != nil {
-				logger.Error().Err(err).Msg("Failed to add audit log to DynamoDB")
-			}
-
-			return err
+			defer sendAuditReport(c, logger, startTime, dsCtx, dynamodbClient, auditTable)
+			return next(c)
 		}
+	}
+}
+
+func sendAuditReport(c echo.Context, logger zerolog.Logger, startTime time.Time, dsCtx *DSContext, dynamodbClient *dynamodb.DynamoDBClient, auditTable string) {
+	if isLocalIP(c.RealIP()) {
+		logger.Warn().Msg("Local IP address skipped")
+		//return err
+	}
+
+	endTime := time.Now()
+	processTime := endTime.Sub(startTime).String()
+	auditPayload := AuditPayload{
+		ID:          dsCtx.RequestID.String(),
+		TenantID:    dsCtx.TenantID.String(),
+		Url:         c.Request().URL.Path,
+		Method:      c.Request().Method,
+		ClientIp:    c.RealIP(),
+		StatusCode:  c.Response().Status,
+		Sub:         dsCtx.Sub,
+		ProcessTime: processTime,
+		CreatedAt:   startTime.Format(time.RFC3339),
+	}
+	logger.Info().Interface("auditPayload", auditPayload).Msg("Audit log")
+
+	// Send the audit log to the audit table
+	item := convertAuditPayloadToDynamoDBMap(auditPayload)
+	err := dynamodbClient.AddItem(auditTable, item)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to add audit log to DynamoDB")
 	}
 }
 

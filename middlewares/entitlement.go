@@ -76,9 +76,13 @@ func NewEntitlementMiddleware(cfg *config.Config, requiredPermissions []string) 
 			cached, err := cacheManager.Get(dsCtx.Sub)
 			if err == nil {
 				logger.Info().Msg("Loading entitlement from cache")
-				entitlementGroups.FromBytes(cached)
+				err := entitlementGroups.FromBytes(cached)
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, errors.ServerError(
+						"Failed to decode entitlement from cache"))
+				}
 			} else {
-				entitlementGroups, err = getEntitlementGroups(c, dsCtx, entitlementUrl)
+				entitlementGroups, _ = getEntitlementGroups(c, dsCtx, entitlementUrl)
 			}
 
 			if !anyPermissionFound(entitlementGroups, requiredPermissions) {

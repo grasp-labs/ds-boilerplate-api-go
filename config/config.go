@@ -21,5 +21,11 @@ type Config struct {
 	// MemoryMB defines the memory in MB for the service
 	MemoryMb string `default:"1024"` // default to 1024
 	// AllowedOrigins defines the allowed origins for the service
-	AllowedOrigins []string `default:"*"` // default to *
+	AllowedOrigins []string
+}
+
+func (c *Config) SetDefaults() {
+	if len(c.AllowedOrigins) == 0 {
+		c.AllowedOrigins = []string{"*"}
+	}
 }

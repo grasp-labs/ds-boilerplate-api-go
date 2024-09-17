@@ -45,11 +45,11 @@ func NewServer(cfg *config.Config) *echo.Echo {
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 		AllowOrigins: cfg.AllowedOrigins,
 	}))
-	healthController := NewHealthController()
-	healthSubRouter := e.Group(cfg.AppRootPath)
+	healthController := NewHealthController(cfg)
+	healthSubRouter := e.Group("/public")
 	RegisterRoutes(cfg, healthSubRouter, healthController)
 
-	Protected = e.Group("/protected")
+	Protected = e.Group(cfg.AppRootPath)
 	Protected.Use(middlewares.NewAuthMiddleware(cfg))
 	Protected.Use(middlewares.NewDSContextMiddleware(cfg))
 	Protected.Use(middlewares.NewUsageMiddleware(cfg))
