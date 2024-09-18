@@ -1,0 +1,41 @@
+name: push
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [arm64]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.59.1
+
+  test:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [arm64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+      - name: Install dependencies
+        run: go mod download
+      - name: Run Tests
+        run: |
+          make test
