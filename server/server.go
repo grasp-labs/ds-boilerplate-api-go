@@ -18,7 +18,7 @@ var Protected *echo.Group
 func RegisterRoutes(cfg *config.Config, g *echo.Group, controller models.Controller) {
 	logger := log.GetLogger()
 	for _, route := range controller.GetRoutes() {
-		logger.Info().Str("Registering route", route.Method)
+		logger.Info().Str("Registering route", route.Method).Send()
 		var entitlementMiddleware []echo.MiddlewareFunc
 
 		if route.RequiredPermissions != nil {
