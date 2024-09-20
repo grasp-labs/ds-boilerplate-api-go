@@ -12,12 +12,21 @@ func InitLogger() {
 		Out:     os.Stdout,
 		NoColor: false,
 		FormatLevel: func(i interface{}) string {
+			if i == nil {
+				return "[INFO]"
+			}
 			return "[" + i.(string) + "]"
 		},
 		FormatMessage: func(i interface{}) string {
+			if i == nil {
+				return ""
+			}
 			return i.(string)
 		},
 		FormatTimestamp: func(i interface{}) string {
+			if i == nil {
+				return ""
+			}
 			return "[" + i.(string) + "]"
 		},
 	}
