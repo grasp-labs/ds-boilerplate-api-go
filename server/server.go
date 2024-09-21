@@ -6,6 +6,7 @@ import (
 	"github.com/grasp-labs/ds-boilerplate-api-go/models"
 	"github.com/grasp-labs/ds-boilerplate-api-go/utils/cache_manager"
 	"github.com/grasp-labs/ds-boilerplate-api-go/utils/log"
+	"github.com/grasp-labs/ds-boilerplate-api-go/validator"
 	"github.com/labstack/echo/v4"
 	echoMiddlewares "github.com/labstack/echo/v4/middleware"
 )
@@ -41,6 +42,8 @@ func NewServer(cfg *config.Config) *echo.Echo {
 	}
 
 	e := echo.New()
+	e.Pre(echoMiddlewares.AddTrailingSlash())
+	e.Validator = validator.NewCustomValidator()
 	e.Use(echoMiddlewares.CORSWithConfig(echoMiddlewares.CORSConfig{
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 		AllowOrigins: cfg.AllowedOrigins,

@@ -1,7 +1,5 @@
 package errors
 
-import "fmt"
-
 const (
 	// Server The operation looked fine but the server couldn't process it.
 	Server string = "server"
@@ -42,11 +40,11 @@ func MissingTenantError(message string) *Error {
 }
 
 // ValidationError Used to represent validation errors.
-func ValidationError(kind, message string) *Error {
+func ValidationError(message string, err error) *Error {
 	return &Error{
 		Type:    User,
-		Err:     fmt.Errorf("%s failed validation", kind),
 		Message: message,
+		Err:     err,
 	}
 }
 
