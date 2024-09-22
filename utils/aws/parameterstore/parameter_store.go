@@ -48,3 +48,36 @@ func (client *SSMClient) SetParameter(name, value string, overwrite bool) error 
 	_, err := client.PutParameter(context.Background(), input)
 	return err
 }
+
+func (client *SSMClient) RemoveParameter(name string) error {
+	input := &ssm.DeleteParameterInput{
+		Name: aws.String(name),
+	}
+
+	_, err := client.DeleteParameter(context.Background(), input)
+	return err
+}
+
+func (client *SSMClient) ListParameters(prefix string) ([]string, error) {
+	input := &ssm.GetParametersByPathInput{
+		Path:           aws.String(prefix),
+		Recursive:      aws.Bool(true), // Recursively list all parameters under the prefix
+		WithDecryption: aws.Bool(true), // Decrypt if parameters are encrypted
+	}
+	var parameters []string
+	paginator := ssm.NewGetParametersByPathPaginator(client, input)
+
+	// Paginate through all the results
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.TODO())
+		if err != nil {
+			return nil, err
+		}
+
+		for _, param := range page.Parameters {
+			parameters = append(parameters, *param.Name)
+		}
+	}
+
+	return parameters, nil
+}
