@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/grasp-labs/ds-boilerplate-api-go/config"
 	"github.com/grasp-labs/ds-boilerplate-api-go/middlewares"
 	"github.com/grasp-labs/ds-boilerplate-api-go/models"
@@ -12,20 +13,27 @@ import (
 
 var cacheManger *cache_manager.CacheManager // nolint:unused
 
-var Protected *echo.Group
+var RootPath *echo.Group
 
 // RegisterRoutes registers all routes for the server
 func RegisterRoutes(cfg *config.Config, g *echo.Group, controller models.Controller) {
 	logger := log.GetLogger()
 	for _, route := range controller.GetRoutes() {
 		logger.Info().Str("Registering route", route.Method).Send()
-		var entitlementMiddleware []echo.MiddlewareFunc
+		var dsMiddlewares []echo.MiddlewareFunc
 
-		if route.RequiredPermissions != nil {
-			entitlementMiddleware = append(entitlementMiddleware, middlewares.NewEntitlementMiddleware(cfg, route.RequiredPermissions))
+		if route.AllowUnauthenticatedUsers == false {
+			dsMiddlewares = append(dsMiddlewares, middlewares.NewAuthMiddleware(cfg))
+			dsMiddlewares = append(dsMiddlewares, middlewares.NewDSContextMiddleware(cfg))
+			dsMiddlewares = append(dsMiddlewares, middlewares.NewUsageMiddleware(cfg))
+			dsMiddlewares = append(dsMiddlewares, middlewares.NewAuditMiddleware(cfg))
 		}
 
-		g.Add(route.Method, route.Path, route.HandlerFunc, entitlementMiddleware...)
+		if route.RequiredPermissions != nil {
+			dsMiddlewares = append(dsMiddlewares, middlewares.NewEntitlementMiddleware(cfg, route.RequiredPermissions))
+		}
+
+		g.Add(route.Method, route.Path, route.HandlerFunc, dsMiddlewares...)
 	}
 }
 
@@ -45,18 +53,14 @@ func NewServer(cfg *config.Config) *echo.Echo {
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 		AllowOrigins: cfg.AllowedOrigins,
 	}))
+
 	healthController := NewHealthController(cfg)
-	healthSubRouter := e.Group("/public")
-	RegisterRoutes(cfg, healthSubRouter, healthController)
 
 	// docs
-	e.Static("/docs", "swaggerui/html")
+	e.Static(fmt.Sprintf("%s/docs/", cfg.AppRootPath), "swaggerui/html")
 
-	Protected = e.Group(cfg.AppRootPath)
-	Protected.Use(middlewares.NewAuthMiddleware(cfg))
-	Protected.Use(middlewares.NewDSContextMiddleware(cfg))
-	Protected.Use(middlewares.NewUsageMiddleware(cfg))
-	Protected.Use(middlewares.NewAuditMiddleware(cfg))
+	RootPath = e.Group(cfg.AppRootPath)
+	RegisterRoutes(cfg, RootPath, healthController)
 
 	return e
 }

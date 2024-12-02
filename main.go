@@ -48,7 +48,7 @@ func (c *SampleController) GetRoutes() models.Routes {
 func main() {
 	cfg := config.Config{
 		AppRootPath: "/app",
-		Port:        ":8081",
+		Port:        ":8080",
 	}
 
 	err := defaults.Set(&cfg)
@@ -59,7 +59,7 @@ func main() {
 	srv := server.NewServer(&cfg)
 
 	sampleController := NewSampleController()
-	server.RegisterRoutes(&cfg, server.Protected, sampleController)
+	server.RegisterRoutes(&cfg, server.RootPath, sampleController)
 
 	for _, route := range srv.Routes() {
 		fmt.Printf("Method: %s, Path: %s\n", route.Method, route.Path)
