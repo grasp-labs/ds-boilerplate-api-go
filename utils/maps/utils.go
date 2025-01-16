@@ -54,3 +54,12 @@ func ToString(keyValues map[string]string) string {
 		return append(acc, fmt.Sprintf("%s=%s", trimmedKey, strings.TrimSpace(keyValues[key])))
 	}), ",")
 }
+
+// GetValueFromMap Returns the value of a key from a map If the key does not
+// exist, the default value is returned
+func GetValueFromMap[T comparable, V any](m map[T]V, key T, defaultValue V) V {
+	if value, ok := m[key]; ok {
+		return value
+	}
+	return defaultValue
+}

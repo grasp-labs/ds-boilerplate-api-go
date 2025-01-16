@@ -26,7 +26,10 @@ func NewAwsSnsClient() (*AwsSnsClient, error) {
 		return nil, fmt.Errorf("failed to load configuration, %v", err)
 	}
 	client := sns.NewFromConfig(cfg)
-	return &AwsSnsClient{client: client}, nil
+	return &AwsSnsClient{
+		client:      client,
+		publishFunc: client.Publish,
+	}, nil
 }
 
 func (c *AwsSnsClient) PublishEvent(ctx context.Context, topicArn string, event Event) error {
@@ -35,14 +38,14 @@ func (c *AwsSnsClient) PublishEvent(ctx context.Context, topicArn string, event 
 	}
 
 	// Serialize the event to JSON
-	eventJson, err := json.Marshal(event)
+	eventStr, err := json.Marshal(event)
 	if err != nil {
 		return fmt.Errorf("failed to marshal event to JSON, %v", err)
 	}
 
 	_, err = c.publishFunc(ctx, &sns.PublishInput{
-		TopicArn: &topicArn,
-		Message:  aws.String(string(eventJson)),
+		TopicArn: aws.String(topicArn),
+		Message:  aws.String(string(eventStr)),
 	})
 
 	if err != nil {
